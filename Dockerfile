@@ -2,7 +2,7 @@ FROM centos:7
 LABEL maintainer="NConf Team - http://www.nconf.org"
 
 # Run update and install dependencies
-RUN yum -y update && yum -y install wget httpd-2* php-5* php-mysql php-ldap mariadb-server-5* perl-5* perl-DBI perl-DBD-MySQL python-setuptools
+RUN yum -y update && yum -y install wget httpd-2* php-5* php-mysql php-ldap mariadb-server-5* perl-5* perl-DBI perl-DBD-MySQL python-setuptools && yum clean all && rpm -e --nodeps centos-logos
 RUN easy_install supervisor
 
 # Fetch NConf
