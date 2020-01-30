@@ -1,36 +1,28 @@
-FROM centos:7
+FROM alpine:3.5
 LABEL maintainer="NConf Team - http://www.nconf.org"
 
 # Run update and install dependencies
-RUN yum -y update && yum -y install wget httpd-2* php-5* php-mysql php-ldap mariadb-server-5* perl-5* perl-DBI perl-DBD-MySQL python-setuptools && yum clean all && rpm -e --nodeps centos-logos
-RUN easy_install supervisor
+RUN echo @oldrepo http://dl-cdn.alpinelinux.org/alpine/v3.0/main >> /etc/apk/repositories
+RUN apk update && apk upgrade && apk add bash wget apache2 php5-apache2 php5-mysql php5-ldap mariadb mysql-client perl@oldrepo perl-dbi@oldrepo perl-dbd-mysql@oldrepo supervisor
 
 # Fetch NConf
-RUN wget https://sourceforge.net/projects/nconf/files/nconf/1.3.0-0/nconf-1.3.0-0.tgz -O /tmp/NConf.tgz
+RUN wget --no-check-certificate https://sourceforge.net/projects/nconf/files/nconf/1.3.0-0/nconf-1.3.0-0.tgz -O /tmp/NConf.tgz
 
-# Add non-root user "swuser"
-#RUN groupadd -r swuser -g 433 && \
-#useradd -u 431 -r -g swuser -d /home/swuser -s /sbin/nologin -c "Docker image user" swuser && \
-#mkdir /home/swuser && \
-#chown -R swuser:swuser /home/swuser
-#ENV HOME /home/swuser
 ENV HOME /root
+ENV WWWHOME /var/www/localhost/htdocs
 WORKDIR $HOME
 
 # Unpack NConf
 RUN mv /tmp/NConf.tgz $HOME/NConf.tgz
-RUN tar xzvf $HOME/NConf.tgz -C /var/www/html/
-RUN chown -R apache:apache /var/www/html/nconf
-RUN chmod 755 /var/www/html/nconf
-RUN cp /var/www/html/nconf/INSTALL/create_database.sql $HOME/create_database.sql
-RUN rm -rf /var/www/html/nconf/INSTALL* /var/www/html/nconf/UPDATE*; rm -rf /var/www/html/nconf/config/; cp -rp /var/www/html/nconf/config.orig/ /var/www/html/nconf/config/
+RUN tar xzvf $HOME/NConf.tgz -C $WWWHOME
+RUN chown -R apache:apache $WWWHOME/nconf
+RUN chmod 755 $WWWHOME/nconf
+RUN cp $WWWHOME/nconf/INSTALL/create_database.sql $HOME/create_database.sql
+RUN rm -rf $WWWHOME/nconf/INSTALL* $WWWHOME/nconf/UPDATE*; rm -rf $WWWHOME/nconf/config/; cp -rp $WWWHOME/nconf/config.orig/ $WWWHOME/nconf/config/
 
 # Configure NConf config variables
-RUN sed -ie "11s/^/#/g" /var/www/html/nconf/config/nconf.php
-RUN sed -ie "16s|^|define('NCONFDIR', \"/var/www/html/nconf/\")\;|g" /var/www/html/nconf/config/nconf.php
-
-# Switch to non-root user
-#USER swuser
+RUN sed -ie "11s/^/#/g" $WWWHOME/nconf/config/nconf.php
+RUN sed -ie "16s|^|define('NCONFDIR', \"$WWWHOME/nconf\")\;|g" $WWWHOME/nconf/config/nconf.php
 
 # Add files to image
 COPY create_db_and_user.sql $HOME
@@ -38,5 +30,7 @@ COPY startup_db.sh $HOME
 COPY supervisord.conf /etc/supervisord.conf
 
 # Start all processes and expose HTTP port
+RUN mkdir /run/apache2/
+RUN ln -s /run/mysqld/ /var/run/mysqld
 CMD /usr/bin/supervisord -c /etc/supervisord.conf
 EXPOSE 80
