@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
 # Prepare and start MySQL / MariaDB in background
-mysql_install_db --user=mysql --basedir=/usr/ --ldata=/var/lib/mysql/
+mysql_install_db --user=mysql --basedir=/usr --ldata=/var/lib/mysql
 mysqld_safe --basedir=/usr &
 sleep 3s
 
