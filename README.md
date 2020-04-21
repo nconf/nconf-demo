@@ -8,7 +8,7 @@ Visit http://www.nconf.org
 ### To run on a Docker host
 `$ docker run --name nconf -d -p 80:8080 nconf/nconf-demo:latest`
 
-### To run on a Kubernetes cluster (e.g. `minikube`)
+### To run on a Kubernetes cluster (e.g. minikube)
 `$ kubectl create deployment nconf --image=nconf/nconf-demo:latest`
 
 `$ kubectl expose deployment nconf --port=80 --target-port=8080 --type=LoadBalancer`
