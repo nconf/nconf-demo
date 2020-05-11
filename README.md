@@ -15,4 +15,4 @@ Visit http://www.nconf.org
 
 Then, point your favourite browser to http://localhost
 
-The `nconf-demo` image is based on Alpine and contains Apache, PHP, Perl, MariaDB, Nagios etc. It is a fully self-contained runtime environment for NConf. Multiple processes are run an daemons inside the container using `supervisord`. No data is persisted and the DB is recreated every time the container starts. Therefore, `nconf-demo` is intended for demo purposes only and is strictly **NOT FOR PRODUCTION USE.** 
+The `nconf-demo` image is based on Alpine and contains Apache, PHP, Perl, MariaDB, Nagios etc. It is a fully self-contained runtime environment for NConf. Multiple processes are run as daemons inside the container using `supervisord`. No data is persisted and the DB is dropped and recreated every time the container starts. Therefore, `nconf-demo` is intended for demo purposes only and is strictly **NOT FOR PRODUCTION USE.** 
